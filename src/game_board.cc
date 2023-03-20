@@ -83,11 +83,38 @@ bool GameBoard::calculate_next_state(int x, int y) {
   }
 }
 
+// ------------------------------
+//      Game Implementation
+// ------------------------------
+
+Game::Game(int x_size, int y_size) : board(GameBoard(x_size, y_size)) {
+  init_sdl();
+  cycle = 0;
+  running = true;
+  // Load font from system default
+  TTF_Init();
+  font = TTF_OpenFont("../fonts/OpenSans-VariableFont_wdth,wght.ttf", 24);
+  if (font == nullptr) {
+    std::cout << "Failed to load font" << std::endl;
+    std::abort();
+  }
+}
+
+Game::~Game() {
+  SDL_DestroyTexture(cycle_texture);
+  SDL_DestroyTexture(start_texture);
+  SDL_DestroyRenderer(renderer);
+  SDL_DestroyWindow(window);
+  TTF_CloseFont(font);
+  TTF_Quit();
+  SDL_Quit();
+}
+
 void Game::init_sdl() {
   SDL_Init(SDL_INIT_VIDEO);
   window = SDL_CreateWindow(
       "Game of Life", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-      board.get_board_size().first * CELL_SIZE,
+      board.get_board_size().first * CELL_SIZE + SIDEBAR_WIDTH,
       board.get_board_size().second * CELL_SIZE, SDL_WINDOW_SHOWN);
   renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 }
@@ -107,81 +134,65 @@ void Game::render() {
     }
   }
 
+  // Load textures for cycle count and start/stop button
+  SDL_Color text_color = {255, 255, 255, 255};
+  SDL_Surface* surface = TTF_RenderText_Solid(
+      font, ("Cycle: \n" + std::to_string(cycle)).c_str(), text_color);
+  cycle_texture = SDL_CreateTextureFromSurface(renderer, surface);
+  SDL_FreeSurface(surface);
+  if (running) {
+    surface = TTF_RenderText_Solid(font, "Stop", text_color);
+  } else {
+    surface = TTF_RenderText_Solid(font, "Start", text_color);
+  }
+  start_texture = SDL_CreateTextureFromSurface(renderer, surface);
+  SDL_FreeSurface(surface);
+
+  // draw the side bar and cycle count
+  SDL_Rect sidebar_rect = {board.get_board_size().first * CELL_SIZE, 0,
+                           SIDEBAR_WIDTH,
+                           board.get_board_size().second * CELL_SIZE};
+  SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+  SDL_RenderFillRect(renderer, &sidebar_rect);
+  SDL_Rect cycle_rect = {board.get_board_size().first * CELL_SIZE + 10, 10,
+                         SIDEBAR_WIDTH - 20, 30};
+  SDL_RenderCopy(renderer, cycle_texture, NULL, &cycle_rect);
+  // draw the start/stop button
+  SDL_Rect start_rect = {board.get_board_size().first * CELL_SIZE + 10,
+                         board.get_board_size().second * CELL_SIZE - 40,
+                         SIDEBAR_WIDTH - 20, 30};
+  SDL_RenderCopy(renderer, start_texture, NULL, &start_rect);
+
   SDL_RenderPresent(renderer);
 }
 
-Game::Game(int x_size, int y_size) : board(GameBoard(x_size, y_size)) {
-  init_sdl();
-}
-
 void Game::run() {
-  bool running = true;
-  while (running) {
+  bool exit = false;
+  while (true) {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
       if (event.type == SDL_QUIT) {
-        running = false;
+        exit = true;
+      } else if (event.type == SDL_MOUSEBUTTONDOWN) {
+        int x = event.button.x;
+        int y = event.button.y;
+        if (x >= board.get_board_size().first * CELL_SIZE &&
+            x <= board.get_board_size().first * CELL_SIZE + SIDEBAR_WIDTH) {
+          if (y >= board.get_board_size().second * CELL_SIZE - 40 &&
+              y <= board.get_board_size().second * CELL_SIZE - 10) {
+            running = !running;
+          }
+        }
       }
     }
-
-    board.update();
+    if (exit) {
+      break;
+    }
+    if (running) {
+      board.update();
+      cycle++;
+    }
     render();
-
     SDL_Delay(DELAY_MS);
   }
-
-  SDL_DestroyRenderer(renderer);
-  SDL_DestroyWindow(window);
-  SDL_Quit();
 }
-
-/*
-Game::Game(int board_x_size, int board_y_size)
-    : board(board_x_size, board_y_size) {
-  init_sdl();
-}
-
-void Game::init_sdl() {
-  SDL_Init(SDL_INIT_VIDEO);
-  window = SDL_CreateWindow("Game of Life", SDL_WINDOWPOS_UNDEFINED,
-                            SDL_WINDOWPOS_UNDEFINED, 640, 480, 0);
-  renderer = SDL_CreateRenderer(window, -1, 0);
-}
-
-void Game::render() {
-  SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-  SDL_RenderClear(renderer);
-  SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-  std::pair<int, int> board_size = board.get_board_size();
-  int cell_width = 640 / board_size.first;
-  int cell_height = 480 / board_size.second;
-  for (int i = 0; i < board_size.first; i++) {
-    for (int j = 0; j < board_size.second; j++) {
-      if (board.get_cell_state(i, j)) {
-        SDL_Rect rect;
-        rect.x = i * cell_width;
-        rect.y = j * cell_height;
-        rect.w = cell_width;
-        rect.h = cell_height;
-        SDL_RenderFillRect(renderer, &rect);
-      }
-    }
-  }
-  SDL_RenderPresent(renderer);
-}
-
-void Game::run() {
-  bool running = true;
-  while (running) {
-    SDL_Event event;
-    while (SDL_PollEvent(&event)) {
-      if (event.type == SDL_QUIT) {
-        running = false;
-      }
-    }
-    render();
-    board.update();
-    SDL_Delay(100);
-  }
-}
-*/
