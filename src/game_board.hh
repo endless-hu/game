@@ -3,23 +3,28 @@
 #include <SDL2/SDL.h>
 
 #include <utility>
+#include <vector>
+
+#define CELL_SIZE 10
+#define DELAY_MS 100
 
 class GameBoard {
  public:
   GameBoard(
       int x_size,
       int y_size);  // Constructor to initialize the board with a given size
-  ~GameBoard();     // Destructor to release memory
+  std::pair<int, int> get_board_size() const;  // Get the size of the board
+  bool get_cell_state(
+      int x, int y) const;  // Get the state of a cell at a given position
   void set_cell_state(
       int x, int y, bool state);  // Set the state of a cell at a given position
-  bool get_cell_state(int x,
-                      int y);  // Get the state of a cell at a given position
-  std::pair<int, int> get_board_size();  // Get the size of the board
-  void update();  // Update the board to the next generation
+  void update();     // Update the board state to the next generation
+  void clear();      // Clear the board
+  void randomize();  // Randomize the board
+  // void god();  // Implement a god function to modify the board state randomly
  private:
-  bool** board;  // The 2D array to hold the board
-  int x_size;
-  int y_size;  // The size of the board
+  int x_size_, y_size_;                   // The size of the board
+  std::vector<std::vector<bool>> cells_;  // The cells of the board
   int count_live_neighbors(
       int x, int y);  // Count the number of live neighbors for a given cell
   bool calculate_next_state(
