@@ -38,7 +38,7 @@ void god_function2(GameBoard* board) {
         prob = 0.0;
       }
       double rand = (double)std::rand() / RAND_MAX;
-      if (rand < prob) {
+      if (rand > prob) {
         board->set_cell_state(x, y, true);
       }
     }
