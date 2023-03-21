@@ -43,18 +43,15 @@ class Game {
   ~Game();                                   // Destructor to clean up SDL
   void run();                                // Run the game loop
  private:
-  GameBoard board;             // The game board
-  SDL_Window* window;          // The SDL window
-  SDL_Renderer* renderer;      // The SDL renderer
-  TTF_Font* font;              // a font to render text
-  SDL_Texture* cycle_texture;  // Texture for the cycle count
-  SDL_Texture* start_texture;  // Texture for the start/stop button
-  // SDL_Rect cycle_rect;         // Rect for the cycle count text
-  // SDL_Rect start_rect;         // Rect for the start/stop button
-  // SDL_Rect sidebar_rect;       // Rectangle representing the sidebar
+  GameBoard board_;             // The game board
+  SDL_Window* window_;          // The SDL window
+  SDL_Renderer* renderer_;      // The SDL renderer
+  TTF_Font* font_;              // a font to render text
+  SDL_Texture* cycle_texture_;  // Texture for the cycle count
+  SDL_Texture* start_texture_;  // Texture for the start/stop button
 
-  uint cycle;    // The current cycle of the game
-  bool running;  // Whether the game is running
+  uint cycle_;    // The current cycle of the game
+  bool running_;  // Whether the game is running
 
   void init_sdl();        // Initialize SDL
   void render();          // Render the current board state

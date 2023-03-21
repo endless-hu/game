@@ -67,9 +67,8 @@ int GameBoard::count_live_neighbors(int x, int y) {
 bool GameBoard::calculate_next_state(int x, int y) {
   int live_neighbors = count_live_neighbors(x, y);
   if (cells_[x][y]) {
-    if (live_neighbors < 2) {
-      return false;
-    } else if (live_neighbors == 2 || live_neighbors == 3) {
+    // Remain alive if 2 or 3 neighbors are alive
+    if (live_neighbors == 2 || live_neighbors == 3) {
       return true;
     } else {
       return false;
@@ -87,49 +86,49 @@ bool GameBoard::calculate_next_state(int x, int y) {
 //      Game Implementation
 // ------------------------------
 
-Game::Game(int x_size, int y_size) : board(GameBoard(x_size, y_size)) {
+Game::Game(int x_size, int y_size) : board_(GameBoard(x_size, y_size)) {
   init_sdl();
-  cycle = 0;
-  running = true;
-  // Load font from system default
+  cycle_ = 0;
+  running_ = true;
+  // Load font
   TTF_Init();
-  font = TTF_OpenFont("../fonts/OpenSans-VariableFont_wdth,wght.ttf", 24);
-  if (font == nullptr) {
+  font_ = TTF_OpenFont("../fonts/OpenSans-VariableFont_wdth,wght.ttf", 24);
+  if (font_ == nullptr) {
     std::cout << "Failed to load font" << std::endl;
     std::abort();
   }
 }
 
 Game::~Game() {
-  SDL_DestroyTexture(cycle_texture);
-  SDL_DestroyTexture(start_texture);
-  SDL_DestroyRenderer(renderer);
-  SDL_DestroyWindow(window);
-  TTF_CloseFont(font);
+  SDL_DestroyTexture(cycle_texture_);
+  SDL_DestroyTexture(start_texture_);
+  SDL_DestroyRenderer(renderer_);
+  SDL_DestroyWindow(window_);
+  TTF_CloseFont(font_);
   TTF_Quit();
   SDL_Quit();
 }
 
 void Game::init_sdl() {
   SDL_Init(SDL_INIT_VIDEO);
-  window = SDL_CreateWindow(
+  window_ = SDL_CreateWindow(
       "Game of Life", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-      board.get_board_size().first * CELL_SIZE + SIDEBAR_WIDTH,
-      board.get_board_size().second * CELL_SIZE, SDL_WINDOW_SHOWN);
-  renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+      board_.get_board_size().first * CELL_SIZE + SIDEBAR_WIDTH,
+      board_.get_board_size().second * CELL_SIZE, SDL_WINDOW_SHOWN);
+  renderer_ = SDL_CreateRenderer(window_, -1, SDL_RENDERER_ACCELERATED);
 }
 
 void Game::render() {
-  SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-  SDL_RenderClear(renderer);
+  SDL_SetRenderDrawColor(renderer_, 0, 0, 0, 255);
+  SDL_RenderClear(renderer_);
 
-  SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-  for (int x = 0; x < board.get_board_size().first; x++) {
-    for (int y = 0; y < board.get_board_size().second; y++) {
-      if (board.get_cell_state(x, y)) {
+  SDL_SetRenderDrawColor(renderer_, 255, 255, 255, 255);
+  for (int x = 0; x < board_.get_board_size().first; x++) {
+    for (int y = 0; y < board_.get_board_size().second; y++) {
+      if (board_.get_cell_state(x, y)) {
         SDL_Rect cell_rect = {x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE,
                               CELL_SIZE};
-        SDL_RenderFillRect(renderer, &cell_rect);
+        SDL_RenderFillRect(renderer_, &cell_rect);
       }
     }
   }
@@ -137,60 +136,56 @@ void Game::render() {
   // Load textures for cycle count and start/stop button
   SDL_Color text_color = {255, 255, 255, 255};
   SDL_Surface* surface = TTF_RenderText_Solid(
-      font, ("Cycle: \n" + std::to_string(cycle)).c_str(), text_color);
-  cycle_texture = SDL_CreateTextureFromSurface(renderer, surface);
+      font_, ("Cycle: \n" + std::to_string(cycle_)).c_str(), text_color);
+  cycle_texture_ = SDL_CreateTextureFromSurface(renderer_, surface);
   SDL_FreeSurface(surface);
-  if (running) {
-    surface = TTF_RenderText_Solid(font, "Stop", text_color);
+  if (running_) {
+    surface = TTF_RenderText_Solid(font_, "Stop", text_color);
   } else {
-    surface = TTF_RenderText_Solid(font, "Start", text_color);
+    surface = TTF_RenderText_Solid(font_, "Start", text_color);
   }
-  start_texture = SDL_CreateTextureFromSurface(renderer, surface);
+  start_texture_ = SDL_CreateTextureFromSurface(renderer_, surface);
   SDL_FreeSurface(surface);
 
   // draw the side bar and cycle count
-  SDL_Rect sidebar_rect = {board.get_board_size().first * CELL_SIZE, 0,
+  SDL_Rect sidebar_rect = {board_.get_board_size().first * CELL_SIZE, 0,
                            SIDEBAR_WIDTH,
-                           board.get_board_size().second * CELL_SIZE};
-  SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-  SDL_RenderFillRect(renderer, &sidebar_rect);
-  SDL_Rect cycle_rect = {board.get_board_size().first * CELL_SIZE + 10, 10,
+                           board_.get_board_size().second * CELL_SIZE};
+  SDL_SetRenderDrawColor(renderer_, 0, 0, 0, 255);
+  SDL_RenderFillRect(renderer_, &sidebar_rect);
+  SDL_Rect cycle_rect = {board_.get_board_size().first * CELL_SIZE + 10, 10,
                          SIDEBAR_WIDTH - 20, 30};
-  SDL_RenderCopy(renderer, cycle_texture, NULL, &cycle_rect);
+  SDL_RenderCopy(renderer_, cycle_texture_, NULL, &cycle_rect);
   // draw the start/stop button
-  SDL_Rect start_rect = {board.get_board_size().first * CELL_SIZE + 10,
-                         board.get_board_size().second * CELL_SIZE - 40,
+  SDL_Rect start_rect = {board_.get_board_size().first * CELL_SIZE + 10,
+                         board_.get_board_size().second * CELL_SIZE - 40,
                          SIDEBAR_WIDTH - 20, 30};
-  SDL_RenderCopy(renderer, start_texture, NULL, &start_rect);
+  SDL_RenderCopy(renderer_, start_texture_, NULL, &start_rect);
 
-  SDL_RenderPresent(renderer);
+  SDL_RenderPresent(renderer_);
 }
 
 void Game::run() {
   bool exit = false;
-  while (true) {
+  while (!exit) {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
       if (event.type == SDL_QUIT) {
         exit = true;
       } else if (event.type == SDL_MOUSEBUTTONDOWN) {
+        // Clicking on the start/stop button toggles the running state
         int x = event.button.x;
         int y = event.button.y;
-        if (x >= board.get_board_size().first * CELL_SIZE &&
-            x <= board.get_board_size().first * CELL_SIZE + SIDEBAR_WIDTH) {
-          if (y >= board.get_board_size().second * CELL_SIZE - 40 &&
-              y <= board.get_board_size().second * CELL_SIZE - 10) {
-            running = !running;
-          }
-        }
+        if ((x >= board_.get_board_size().first * CELL_SIZE &&
+             x <= board_.get_board_size().first * CELL_SIZE + SIDEBAR_WIDTH) &&
+            (y >= board_.get_board_size().second * CELL_SIZE - 40 &&
+             y <= board_.get_board_size().second * CELL_SIZE - 10))
+          running_ = !running_;
       }
     }
-    if (exit) {
-      break;
-    }
-    if (running) {
-      board.update();
-      cycle++;
+    if (running_) {
+      board_.update();
+      cycle_++;
     }
     render();
     SDL_Delay(DELAY_MS);
