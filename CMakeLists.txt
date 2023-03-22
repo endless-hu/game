@@ -31,3 +31,14 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 # Link against SDL2 and SDL2_ttf libraries
 target_include_directories(${PROJECT_NAME} PUBLIC ${SDL2_TTF_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARIES} ${SDL2_TTF_LIBRARIES})
+
+# Configure all ctests under test/
+# the test sources should include the header files in src/
+file(GLOB_RECURSE TEST_SOURCES "test/*.cc")
+foreach(TEST_SOURCE ${TEST_SOURCES})
+  get_filename_component(TEST_NAME ${TEST_SOURCE} NAME_WE)
+  add_executable(${TEST_NAME} ${TEST_SOURCE})
+  target_include_directories(${TEST_NAME} PUBLIC src)
+  target_link_libraries(${TEST_NAME} ${SDL2_LIBRARIES} ${SDL2_TTF_LIBRARIES})
+  add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
+endforeach()

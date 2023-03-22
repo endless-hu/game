@@ -62,12 +62,6 @@ class OptimizedGameBoard : public AbstractGameBoard {
   void randomize();  // Randomize the board
  private:
   int x_size_, y_size_;  // The size of the board
-  // The cells of the board. The first dimension is the x coordinate,
-  // the second dimension is the y coordinate.
-  std::vector<std::vector<bool>> cells_;
-  // The number of live neighbors for each cell. The first dimension is the x
-  // coordinate, the second dimension is the y coordinate.
-  std::vector<std::vector<int>> live_neighbors_;
   // Count the number of live neighbors for a given cell
   int count_live_neighbors(int x, int y);
   // Calculate the next state of a cell at a given position
