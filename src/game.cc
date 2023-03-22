@@ -114,6 +114,9 @@ void Game::draw_clear_button() {
   SDL_FreeSurface(surface);
   SDL_RenderCopy(renderer_, clear_texture, NULL, &clear_rect);
   SDL_DestroyTexture(clear_texture);
+  // Add a border to the start/stop button, the boarder color is azure
+  SDL_SetRenderDrawColor(renderer_, 0, 127, 255, 255);
+  SDL_RenderDrawRect(renderer_, &clear_rect);
 }
 
 void Game::draw_start_button() {
@@ -135,6 +138,9 @@ void Game::draw_start_button() {
 
   SDL_RenderCopy(renderer_, start_texture, NULL, &start_rect);
   SDL_DestroyTexture(start_texture);
+  // Add a border to the start/stop button, the boarder color is azure
+  SDL_SetRenderDrawColor(renderer_, 0, 127, 255, 255);
+  SDL_RenderDrawRect(renderer_, &start_rect);
 }
 
 void Game::draw_board() {
