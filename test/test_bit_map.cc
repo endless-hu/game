@@ -1,42 +1,12 @@
 #include <assert.h>
 
 #include <iostream>
-#include <unordered_set>
 
 #include "bit_map.hh"
+#include "test_harness.hh"
 
-class Point {
- public:
-  Point() = default;
-  Point(int x, int y) : x_(x), y_(y) {}
-  ~Point() = default;
-
-  int x() const { return x_; }
-  int y() const { return y_; }
-
-  bool operator==(const Point& other) const {
-    return x_ == other.x_ && y_ == other.y_;
-  }
-
- private:
-  int x_;
-  int y_;
-};
-
-namespace std {
-template <>
-struct hash<Point> {
-  size_t operator()(const Point& p) const {
-    size_t h1 = std::hash<int>()(p.x());
-    size_t h2 = std::hash<int>()(p.y());
-    return h1 ^ (h2 << 1);
-  }
-};
-}  // namespace std
-
-int main() {
-  // seed the random number generator
-  srand(time(NULL));
+// test 1
+void random_test() {
   TwoDimBitMap bit_map(100, 100);
   std::unordered_set<Point> points;
   // randomly generate a number of points
@@ -64,5 +34,40 @@ int main() {
     }
   }
 
-  std::cout << "Test passed!" << std::endl;
+  std::cout << "random_test passed!" << std::endl;
+}
+
+// test 2: Check the boarder
+void boarder_test() {
+  TwoDimBitMap bit_map(256, 256);
+  // set the top and bottom boarder
+  for (int x = 0; x < 256; x++) {
+    assert(!bit_map.get(x, 0));
+    assert(!bit_map.get(x, 255));
+    bit_map.set(x, 0);
+    bit_map.set(x, 255);
+    assert(bit_map.get(x, 0));
+    assert(bit_map.get(x, 255));
+  }
+  // set the left and right boarder
+  for (int y = 0; y < 256; y++) {
+    assert(!bit_map.get(0, 0));
+    assert(!bit_map.get(255, y));
+    bit_map.set(0, y);
+    bit_map.set(255, y);
+    assert(bit_map.get(0, 0));
+    assert(bit_map.get(255, y));
+  }
+
+  assert(!bit_map.get(1, 1));
+
+  std::cout << "boarder_test passed!" << std::endl;
+}
+
+int main() {
+  // seed the random number generator
+  srand(time(NULL));
+  random_test();
+  boarder_test();
+  std::cout << "All tests passed" << std::endl;
 }
