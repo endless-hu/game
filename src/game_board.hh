@@ -7,6 +7,8 @@
 #include <utility>
 #include <vector>
 
+#include "bit_map.hh"
+
 #define CELL_SIZE 10
 #define DELAY_MS 100
 #define SIDEBAR_WIDTH 200
@@ -18,12 +20,13 @@ class AbstractGameBoard {
   virtual std::pair<int, int> get_board_size() const = 0;
   virtual bool get_cell_state(int x, int y) const = 0;
   virtual void set_cell_state(int x, int y, bool state) = 0;
-  virtual void update() = 0;
-  virtual void clear() = 0;
-  virtual void randomize() = 0;
+  virtual void update() = 0;  // Update the board state to the next generation
+  virtual void clear() = 0;   // Clear the board
 
  protected:
+  // Count the number of live neighbors for a given cell
   virtual int count_live_neighbors(int x, int y) = 0;
+  // Calculate the next state of a cell at a given position
   virtual bool calculate_next_state(int x, int y) = 0;
 };
 
@@ -36,16 +39,16 @@ class GameBoard : public AbstractGameBoard {
   bool get_cell_state(int x, int y) const;
   void set_cell_state(int x, int y, bool state);
 
-  void update();     // Update the board state to the next generation
-  void clear();      // Clear the board
-  void randomize();  // Randomize the board
+  void update();
+  void clear();
+
+ protected:
+  int count_live_neighbors(int x, int y);
+  bool calculate_next_state(int x, int y);
+
  private:
   int x_size_, y_size_;                   // The size of the board
   std::vector<std::vector<bool>> cells_;  // The cells of the board
-  // Count the number of live neighbors for a given cell
-  int count_live_neighbors(int x, int y);
-  // Calculate the next state of a cell at a given position
-  bool calculate_next_state(int x, int y);
 };
 
 // Optimized implementation of the game board
@@ -57,13 +60,14 @@ class OptimizedGameBoard : public AbstractGameBoard {
   bool get_cell_state(int x, int y) const;
   void set_cell_state(int x, int y, bool state);
 
-  void update();     // Update the board state to the next generation
-  void clear();      // Clear the board
-  void randomize();  // Randomize the board
+  void update();
+  void clear();
+
+ protected:
+  int count_live_neighbors(int x, int y);
+  bool calculate_next_state(int x, int y);
+
  private:
   int x_size_, y_size_;  // The size of the board
-  // Count the number of live neighbors for a given cell
-  int count_live_neighbors(int x, int y);
-  // Calculate the next state of a cell at a given position
-  bool calculate_next_state(int x, int y);
+  TwoDimBitMap cells_;   // The cells of the board
 };

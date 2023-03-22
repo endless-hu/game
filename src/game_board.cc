@@ -13,14 +13,6 @@ void GameBoard::clear() {
   }
 }
 
-void GameBoard::randomize() {
-  for (int x = 0; x < x_size_; x++) {
-    for (int y = 0; y < y_size_; y++) {
-      cells_[x][y] = rand() % 2;
-    }
-  }
-}
-
 void GameBoard::set_cell_state(int x, int y, bool state) {
   cells_[x][y] = state;
 }
