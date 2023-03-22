@@ -19,6 +19,18 @@ void OptimizedGameBoard::set_cell_state(int x, int y, bool state) {
   }
 }
 
+void OptimizedGameBoard::read_state_from(std::vector<bool>& vec) {
+  assert(vec.size() == (uint64_t)(x_size_ * y_size_));
+  int idx = 0;
+  for (int i = 0; i < x_size_; i++) {
+    for (int j = 0; j < y_size_; j++) {
+      if (vec[idx++]) {
+        cells_.set(i, j);
+      }
+    }
+  }
+}
+
 void OptimizedGameBoard::update() {
   TwoDimBitMap next_cells(x_size_, y_size_);
   for (int i = 0; i < x_size_; i++) {

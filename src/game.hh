@@ -5,6 +5,11 @@
 
 #include "game_board.hh"
 
+#define CELL_SIZE 5
+#define DELAY_MS 100
+#define SIDEBAR_WIDTH 200
+#define CTRL_BUTTON_HIGHT 100
+
 class Game {
  public:
   explicit Game(AbstractGameBoard* board,

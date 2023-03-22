@@ -19,6 +19,16 @@ void GameBoard::set_cell_state(int x, int y, bool state) {
 
 bool GameBoard::get_cell_state(int x, int y) const { return cells_[x][y]; }
 
+void GameBoard::read_state_from(std::vector<bool>& vec) {
+  assert(vec.size() == (uint64_t)(x_size_ * y_size_));
+  int idx = 0;
+  for (int i = 0; i < x_size_; i++) {
+    for (int j = 0; j < y_size_; j++) {
+      cells_[i][j] = vec[idx++];
+    }
+  }
+}
+
 std::pair<int, int> GameBoard::get_board_size() const {
   return std::make_pair(x_size_, y_size_);
 }

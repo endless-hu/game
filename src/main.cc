@@ -1,5 +1,7 @@
-#include "game.hh"
+#include <sys/wait.h>
+#include <unistd.h>
 
+#include "game.hh"
 // include for std::tie
 #include <tuple>
 
@@ -75,13 +77,36 @@ void god_function3(AbstractGameBoard* board) {
 
 int main() {
   srand(10808);  // Set the seed for the random number generator
+
+  std::vector<bool> vec(256UL * 256UL);
+  for (uint64_t i = 0; i < vec.size(); i++) {
+    if (rand() < RAND_MAX / 2) {
+      vec[i] = true;
+    }
+  }
+
   std::vector<void (*)(AbstractGameBoard*)> god_functions;
   god_functions.push_back(god_function1);
   god_functions.push_back(god_function2);
   god_functions.push_back(god_function3);
 
-  GameBoard* board = new GameBoard(100, 100);
-  Game game(board, god_functions, true, 1);
-  game.run();
-  delete board;
+  pid_t c_pid = fork();
+  if (c_pid == -1) {
+    perror("fork");
+    exit(EXIT_FAILURE);
+  } else if (c_pid == 0) {
+    // child process
+    OptimizedGameBoard* game_board = new OptimizedGameBoard(256, 256);
+    Game game(game_board, god_functions, true, 0);
+    game_board->read_state_from(vec);
+    game.run();
+    delete game_board;
+  } else {
+    GameBoard* game_board = new GameBoard(256, 256);
+    game_board->read_state_from(vec);
+    Game game(game_board, god_functions, true, 0);
+    game.run();
+    delete game_board;
+    wait(nullptr);
+  }
 }

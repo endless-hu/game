@@ -9,17 +9,13 @@
 
 #include "bit_map.hh"
 
-#define CELL_SIZE 10
-#define DELAY_MS 100
-#define SIDEBAR_WIDTH 200
-#define CTRL_BUTTON_HIGHT 100
-
 class AbstractGameBoard {
  public:
   virtual ~AbstractGameBoard() = default;
   virtual std::pair<int, int> get_board_size() const = 0;
   virtual bool get_cell_state(int x, int y) const = 0;
   virtual void set_cell_state(int x, int y, bool state) = 0;
+  virtual void read_state_from(std::vector<bool>& vec) = 0;
   virtual void update() = 0;  // Update the board state to the next generation
   virtual void clear() = 0;   // Clear the board
 
@@ -38,6 +34,7 @@ class GameBoard : public AbstractGameBoard {
   std::pair<int, int> get_board_size() const;
   bool get_cell_state(int x, int y) const;
   void set_cell_state(int x, int y, bool state);
+  void read_state_from(std::vector<bool>& vec);
 
   void update();
   void clear();
@@ -59,6 +56,7 @@ class OptimizedGameBoard : public AbstractGameBoard {
   std::pair<int, int> get_board_size() const;
   bool get_cell_state(int x, int y) const;
   void set_cell_state(int x, int y, bool state);
+  void read_state_from(std::vector<bool>& vec);
 
   void update();
   void clear();
