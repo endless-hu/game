@@ -1,10 +1,10 @@
-#include "game_board.hh"
+#include "game.hh"
 
 // include for std::tie
 #include <tuple>
 
 // This god function seeds all cells at the boarder to be alive
-void god_function1(GameBoard* board) {
+void god_function1(AbstractGameBoard* board) {
   int x_size, y_size;
   std::tie(x_size, y_size) = board->get_board_size();
   for (int x = 0; x < x_size; x++) {
@@ -19,7 +19,7 @@ void god_function1(GameBoard* board) {
 
 // This god function seeds life in a normal distribution, i.e. the center of the
 // board is more likely to be alive than the edges
-void god_function2(GameBoard* board) {
+void god_function2(AbstractGameBoard* board) {
   int x_size, y_size;
   std::tie(x_size, y_size) = board->get_board_size();
   for (int x = 0; x < x_size; x++) {
@@ -47,7 +47,7 @@ void god_function2(GameBoard* board) {
 
 // This god function terminates life in an anti-normal distribution, i.e. the
 // edge of the board is more likely to be dead than the center
-void god_function3(GameBoard* board) {
+void god_function3(AbstractGameBoard* board) {
   int x_size, y_size;
   std::tie(x_size, y_size) = board->get_board_size();
   for (int x = 0; x < x_size; x++) {
@@ -75,10 +75,13 @@ void god_function3(GameBoard* board) {
 
 int main() {
   srand(10808);  // Set the seed for the random number generator
-  std::vector<void (*)(GameBoard*)> god_functions;
+  std::vector<void (*)(AbstractGameBoard*)> god_functions;
   god_functions.push_back(god_function1);
   god_functions.push_back(god_function2);
   god_functions.push_back(god_function3);
-  Game game(100, 100, god_functions);
+
+  GameBoard* board = new GameBoard(100, 100);
+  Game game(board, god_functions, true, 1);
   game.run();
+  delete board;
 }

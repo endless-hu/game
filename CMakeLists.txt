@@ -11,8 +11,23 @@ include_directories(${SDL2_INCLUDE_DIRS})
 set(SDL2_TTF_INCLUDE_DIRS "/usr/include/SDL2")
 set(SDL2_TTF_LIBRARIES "/usr/lib/x86_64-linux-gnu/libSDL2_ttf.so")
 
+# Set the build type to Debug or Release
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+endif()
+
+# Set the compiler flags, use AddressSanitizer for Debug builds
+if(CMAKE_BUILD_TYPE MATCHES Debug)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Werror -fsanitize=address")
+else()
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Werror")
+endif()
+
 # Add source files and link libraries
-add_executable(game_of_life src/main.cc src/game_board.cc)
+# Add all .cc files under src/
+file(GLOB_RECURSE SOURCES "src/*.cc")
+add_executable(${PROJECT_NAME} ${SOURCES})
+
 # Link against SDL2 and SDL2_ttf libraries
 target_include_directories(${PROJECT_NAME} PUBLIC ${SDL2_TTF_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARIES} ${SDL2_TTF_LIBRARIES})
