@@ -98,16 +98,22 @@ int main() {
   if (c_pid == 0) {
     // child process
     AbstractGameBoard* game_board = new OptimizedGameBoard(256, 256);
-    Game game(game_board, god_functions, false, 0);
+    Game game(game_board, god_functions, true, 0);
     game_board->read_state_from(vec);
     game.run();
+    std::cout << "Optimized GameBoard occupied "
+              << game_board->report_mem_usage() << " bytes of memory."
+              << std::endl;
     delete game_board;
     exit(0);
   } else {
     GameBoard* game_board = new GameBoard(256, 256);
     game_board->read_state_from(vec);
-    Game game(game_board, god_functions, false, 0);
+    Game game(game_board, god_functions, true, 0);
     game.run();
+    std::cout << "Unoptimized GameBoard occupied "
+              << game_board->report_mem_usage() << " bytes of memory."
+              << std::endl;
     delete game_board;
   }
   wait(nullptr);

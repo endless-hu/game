@@ -42,6 +42,8 @@ class BitMap {
     for (auto& bit : bits_) bit = 0UL;
   }
 
+  int report_memory_usage() const { return bits_.size() * sizeof(uint64_t); }
+
  private:
   std::vector<uint64_t> bits_;
 };
@@ -63,6 +65,12 @@ class TwoDimBitMap {
   // Clear the bit map
   void clear() {
     for (auto& bit_map : bits_) bit_map.clear();
+  }
+
+  int report_memory_usage() const {
+    int total = 0;
+    for (const auto& bit_map : bits_) total += bit_map.report_memory_usage();
+    return total;
   }
 
  private:

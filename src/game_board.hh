@@ -18,6 +18,8 @@ class AbstractGameBoard {
   virtual void read_state_from(std::vector<bool>& vec) = 0;
   virtual void update() = 0;  // Update the board state to the next generation
   virtual void clear() = 0;   // Clear the board
+  // For test purpose
+  virtual int report_mem_usage() = 0;
 
  protected:
   // Count the number of live neighbors for a given cell
@@ -38,6 +40,8 @@ class GameBoard : public AbstractGameBoard {
 
   void update();
   void clear();
+
+  int report_mem_usage();
 
  protected:
   int count_live_neighbors(int x, int y);
@@ -60,6 +64,8 @@ class OptimizedGameBoard : public AbstractGameBoard {
 
   void update();
   void clear();
+
+  int report_mem_usage();
 
  protected:
   int count_live_neighbors(int x, int y);

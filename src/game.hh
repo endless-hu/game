@@ -17,6 +17,8 @@ class Game {
                 bool running, int init_with_god);
   ~Game();     // Destructor to clean up SDL
   void run();  // Run the game loop
+  int report_game_board_mem_usage();
+
  private:
   AbstractGameBoard* board_;  // The game board
   SDL_Window* window_;        // The SDL window

@@ -72,6 +72,12 @@ bool GameBoard::calculate_next_state(int x, int y) {
   }
 }
 
+int GameBoard::report_mem_usage() { return x_size_ * y_size_ * sizeof(bool); }
+
+// ---------------------------------------------------------------------------
+//                   OptimizedGameBoard
+// ---------------------------------------------------------------------------
+
 OptimizedGameBoard::OptimizedGameBoard(int x_size, int y_size)
     : x_size_(x_size), y_size_(y_size), cells_(x_size, y_size) {}
 
@@ -149,4 +155,8 @@ bool OptimizedGameBoard::calculate_next_state(int x, int y) {
   } else {
     return live_neighbors == 3;
   }
+}
+
+int OptimizedGameBoard::report_mem_usage() {
+  return cells_.report_memory_usage();
 }

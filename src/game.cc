@@ -216,3 +216,5 @@ void Game::run() {
     SDL_Delay(DELAY_MS);
   }
 }
+
+int Game::report_game_board_mem_usage() { return board_->report_mem_usage(); }
