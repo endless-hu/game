@@ -66,19 +66,9 @@ int GameBoard::count_live_neighbors(int x, int y) {
 bool GameBoard::calculate_next_state(int x, int y) {
   int live_neighbors = count_live_neighbors(x, y);
   if (cells_[x][y]) {
-    // Remain alive if 2 or 3 neighbors are alive
-    if (live_neighbors == 2 || live_neighbors == 3) {
-      return true;
-    } else {
-      return false;
-    }
+    return live_neighbors == 2 || live_neighbors == 3;
   } else {
-    // Become alive if 3 neighbors are alive
-    if (live_neighbors == 3) {
-      return true;
-    } else {
-      return false;
-    }
+    return live_neighbors == 3;
   }
 }
 
@@ -136,19 +126,15 @@ int OptimizedGameBoard::count_live_neighbors(int x, int y) {
       if (i == 0 && j == 0) {
         continue;
       }
-      int x_pos = x + i;
-      int y_pos = y + j;
-      if (x_pos < 0) {
-        x_pos = x_size_ - 1;
-      } else if (x_pos >= x_size_) {
-        x_pos = 0;
+      if (i == 0 && j == 0) {
+        continue;
       }
-      if (y_pos < 0) {
-        y_pos = y_size_ - 1;
-      } else if (y_pos >= y_size_) {
-        y_pos = 0;
+      int new_x = x + i;
+      int new_y = y + j;
+      if (new_x < 0 || new_x >= x_size_ || new_y < 0 || new_y >= y_size_) {
+        continue;
       }
-      if (cells_.get(x_pos, y_pos)) {
+      if (cells_.get(new_x, new_y)) {
         count++;
       }
     }
