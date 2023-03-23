@@ -132,9 +132,6 @@ int OptimizedGameBoard::count_live_neighbors(int x, int y) {
       if (i == 0 && j == 0) {
         continue;
       }
-      if (i == 0 && j == 0) {
-        continue;
-      }
       int new_x = x + i;
       int new_y = y + j;
       if (new_x < 0 || new_x >= x_size_ || new_y < 0 || new_y >= y_size_) {
@@ -152,9 +149,8 @@ bool OptimizedGameBoard::calculate_next_state(int x, int y) {
   int live_neighbors = count_live_neighbors(x, y);
   if (cells_.get(x, y)) {
     return live_neighbors == 2 || live_neighbors == 3;
-  } else {
-    return live_neighbors == 3;
   }
+  return live_neighbors == 3;
 }
 
 int OptimizedGameBoard::report_mem_usage() {

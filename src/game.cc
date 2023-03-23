@@ -179,53 +179,7 @@ void Game::run() {
     run_without_gui();
     return;
   }
-  bool exit = false;
-  while (!exit) {
-    SDL_Event event;
-    while (SDL_PollEvent(&event)) {
-      if (event.type == SDL_QUIT) {
-        exit = true;
-      } else if (event.type == SDL_MOUSEBUTTONDOWN) {
-        int button_width = SIDEBAR_WIDTH - 20;
-        // Clicking on the start/stop button toggles the running state
-        int x = event.button.x;
-        int y = event.button.y;
-        if ((x >= board_->get_board_size().first * CELL_SIZE &&
-             x <= board_->get_board_size().first * CELL_SIZE + SIDEBAR_WIDTH) &&
-            (y >= board_->get_board_size().second * CELL_SIZE -
-                      CTRL_BUTTON_HIGHT &&
-             y <= board_->get_board_size().second * CELL_SIZE))
-          running_ = !running_;
-
-        // Clicking on the clear button clears the board
-        if ((x >= board_->get_board_size().first * CELL_SIZE &&
-             x <= board_->get_board_size().first * CELL_SIZE + button_width) &&
-            (y >= board_->get_board_size().second * CELL_SIZE -
-                      2 * CTRL_BUTTON_HIGHT &&
-             y <= board_->get_board_size().second * CELL_SIZE -
-                      CTRL_BUTTON_HIGHT)) {
-          board_->clear();
-          cycle_ = 0;
-          running_ = false;
-        }
-
-        // Clicking on a god function button runs the corresponding function
-        int button_height = 30;
-        int button_y = (board_->get_board_size().second * CELL_SIZE -
-                        god_functions_.size() * button_height) /
-                       2;
-        for (int i = 0; i < static_cast<int>(god_functions_.size()); i++) {
-          if ((x >= board_->get_board_size().first * CELL_SIZE &&
-               x <=
-                   board_->get_board_size().first * CELL_SIZE + button_width) &&
-              (y >= button_y + i * button_height &&
-               y <= button_y + (i + 1) * button_height)) {
-            god_functions_[i](board_);
-            break;
-          }
-        }
-      }
-    }
+  while (handle_events()) {
     if (running_) {
       // count cpu time
       auto start = std::chrono::high_resolution_clock::now();
@@ -244,6 +198,54 @@ void Game::run() {
     render();
     SDL_Delay(DELAY_MS);
   }
+}
+
+bool Game::handle_events() {
+  SDL_Event event;
+  while (SDL_PollEvent(&event)) {
+    if (event.type == SDL_QUIT) {
+      return false;
+    } else if (event.type == SDL_MOUSEBUTTONDOWN) {
+      int button_width = SIDEBAR_WIDTH - 20;
+      // Clicking on the start/stop button toggles the running state
+      int x = event.button.x;
+      int y = event.button.y;
+      if ((x >= board_->get_board_size().first * CELL_SIZE &&
+           x <= board_->get_board_size().first * CELL_SIZE + SIDEBAR_WIDTH) &&
+          (y >= board_->get_board_size().second * CELL_SIZE -
+                    CTRL_BUTTON_HIGHT &&
+           y <= board_->get_board_size().second * CELL_SIZE))
+        running_ = !running_;
+
+      // Clicking on the clear button clears the board
+      if ((x >= board_->get_board_size().first * CELL_SIZE &&
+           x <= board_->get_board_size().first * CELL_SIZE + button_width) &&
+          (y >= board_->get_board_size().second * CELL_SIZE -
+                    2 * CTRL_BUTTON_HIGHT &&
+           y <= board_->get_board_size().second * CELL_SIZE -
+                    CTRL_BUTTON_HIGHT)) {
+        board_->clear();
+        cycle_ = 0;
+        running_ = false;
+      }
+
+      // Clicking on a god function button runs the corresponding function
+      int button_height = 30;
+      int button_y = (board_->get_board_size().second * CELL_SIZE -
+                      god_functions_.size() * button_height) /
+                     2;
+      for (int i = 0; i < static_cast<int>(god_functions_.size()); i++) {
+        if ((x >= board_->get_board_size().first * CELL_SIZE &&
+             x <= board_->get_board_size().first * CELL_SIZE + button_width) &&
+            (y >= button_y + i * button_height &&
+             y <= button_y + (i + 1) * button_height)) {
+          god_functions_[i](board_);
+          break;
+        }
+      }
+    }
+  }
+  return true;
 }
 
 // Must be called with `running_` set to true and `stop_at_round_` set

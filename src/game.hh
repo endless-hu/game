@@ -38,10 +38,9 @@ class Game {
   // as an argument and modifies the board state in some patterns.
   std::vector<void (*)(AbstractGameBoard*)> god_functions_;
 
-  void init_sdl();        // Initialize SDL
-  void render();          // Render the current board state
-  void render_sidebar();  // Render the sidebar with cycle count and button
-  void handle_events();   // Handle SDL events
+  void init_sdl();       // Initialize SDL
+  void render();         // Render the current board state
+  bool handle_events();  // Handle SDL events
 
   void draw_board();
   void draw_sidebar();
