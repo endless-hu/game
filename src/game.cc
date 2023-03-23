@@ -1,11 +1,14 @@
 #include "game.hh"
 
+#include <chrono>
+
 Game::Game(AbstractGameBoard* board,
            std::vector<void (*)(AbstractGameBoard*)> god_functions,
            bool running, int init_with_god)
     : board_(board),
       cycle_(0),
       running_(running),
+      cpu_time_(0),
       god_functions_(god_functions) {
   init_sdl();
 
@@ -205,7 +208,14 @@ void Game::run() {
       }
     }
     if (running_) {
+      // count cpu time
+      auto start = std::chrono::high_resolution_clock::now();
       board_->update();
+      auto end = std::chrono::high_resolution_clock::now();
+      auto duration =
+          std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+      cpu_time_ += duration.count();
+
       cycle_++;
       // auto stop at cycle 100
       if (cycle_ == 100) {
@@ -216,5 +226,3 @@ void Game::run() {
     SDL_Delay(DELAY_MS);
   }
 }
-
-int Game::report_game_board_mem_usage() { return board_->report_mem_usage(); }

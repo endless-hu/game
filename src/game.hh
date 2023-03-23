@@ -17,7 +17,9 @@ class Game {
                 bool running, int init_with_god);
   ~Game();     // Destructor to clean up SDL
   void run();  // Run the game loop
-  int report_game_board_mem_usage();
+
+  // Report CPU time in mirco seconds
+  int report_CPU_time() { return cpu_time_; }
 
  private:
   AbstractGameBoard* board_;  // The game board
@@ -25,8 +27,9 @@ class Game {
   SDL_Renderer* renderer_;    // The SDL renderer
   TTF_Font* font_;            // a font to render text
 
-  uint cycle_;    // The current cycle of the game
-  bool running_;  // Whether the game is running
+  uint cycle_;        // The current cycle of the game
+  bool running_;      // Whether the game is running
+  int64_t cpu_time_;  // accumulate the CPU time in micro seconds
 
   // a set of god functions. The god function takes a GameBoard*
   // as an argument and modifies the board state in some patterns.

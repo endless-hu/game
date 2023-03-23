@@ -104,6 +104,8 @@ int main() {
     std::cout << "Optimized GameBoard occupied "
               << game_board->report_mem_usage() << " bytes of memory."
               << std::endl;
+    std::cout << "Optimized GameBoard costs " << game.report_CPU_time()
+              << " us." << std::endl;
     delete game_board;
     exit(0);
   } else {
@@ -114,6 +116,8 @@ int main() {
     std::cout << "Unoptimized GameBoard occupied "
               << game_board->report_mem_usage() << " bytes of memory."
               << std::endl;
+    std::cout << "Unoptimized GameBoard costs " << game.report_CPU_time()
+              << " us." << std::endl;
     delete game_board;
   }
   wait(nullptr);
