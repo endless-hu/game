@@ -75,16 +75,13 @@ void god_function3(AbstractGameBoard* board) {
   }
 }
 
-int main() {
-  srand(10808);  // Set the seed for the random number generator
-
-  std::vector<bool> vec(256UL * 256UL);
+void test(int x_size, int y_size, int rounds) {
+  std::vector<bool> vec(x_size * y_size);
   for (uint64_t i = 0; i < vec.size(); i++) {
     if (rand() < RAND_MAX / 2) {
       vec[i] = true;
     }
   }
-
   std::vector<void (*)(AbstractGameBoard*)> god_functions;
   god_functions.push_back(god_function1);
   god_functions.push_back(god_function2);
@@ -97,28 +94,36 @@ int main() {
   }
   if (c_pid == 0) {
     // child process
-    AbstractGameBoard* game_board = new OptimizedGameBoard(256, 256);
-    Game game(game_board, god_functions, true, 0);
+    AbstractGameBoard* game_board = new OptimizedGameBoard(x_size, y_size);
+    Game game(game_board, god_functions, true, 0, rounds);
     game_board->read_state_from(vec);
     game.run();
     std::cout << "Optimized GameBoard occupied "
               << game_board->report_mem_usage() << " bytes of memory."
               << std::endl;
-    std::cout << "Optimized GameBoard costs " << game.report_CPU_time()
-              << " us." << std::endl;
+    std::cout << "Optimized GameBoard costs " << game.report_CPU_time() / 1000
+              << " ms." << std::endl;
     delete game_board;
     exit(0);
   } else {
-    GameBoard* game_board = new GameBoard(256, 256);
+    AbstractGameBoard* game_board = new GameBoard(x_size, y_size);
     game_board->read_state_from(vec);
-    Game game(game_board, god_functions, true, 0);
+    Game game(game_board, god_functions, true, 0, rounds);
     game.run();
     std::cout << "Unoptimized GameBoard occupied "
               << game_board->report_mem_usage() << " bytes of memory."
               << std::endl;
-    std::cout << "Unoptimized GameBoard costs " << game.report_CPU_time()
-              << " us." << std::endl;
+    std::cout << "Unoptimized GameBoard costs " << game.report_CPU_time() / 1000
+              << " ms." << std::endl;
     delete game_board;
   }
   wait(nullptr);
+}
+
+int main() {
+  srand(10808);  // Set the seed for the random number generator
+  std::cout << "------- Verification Test ---------" << std::endl;
+  test(256, 256, 100);
+  // std::cout << "------- Speed Test ---------" << std::endl;
+  // test(2048, 2048, 1000);
 }

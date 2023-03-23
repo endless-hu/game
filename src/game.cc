@@ -4,12 +4,21 @@
 
 Game::Game(AbstractGameBoard* board,
            std::vector<void (*)(AbstractGameBoard*)> god_functions,
-           bool running, int init_with_god)
+           bool running, int init_with_god, int stop_at_round)
     : board_(board),
       cycle_(0),
       running_(running),
       cpu_time_(0),
+      stop_at_round_(stop_at_round),
+      gui_(check_GUI()),
       god_functions_(god_functions) {
+  if (!gui_) {
+    std::cout << "Board size is too large to fit in the screen, can only run "
+                 "without GUI"
+              << std::endl;
+    return;
+  }
+
   init_sdl();
 
   // Load font
@@ -26,6 +35,12 @@ Game::Game(AbstractGameBoard* board,
 }
 
 Game::~Game() {
+  if (!gui_) {
+    std::cout << "We did not initialize SDL, so we don't need to clean up"
+              << std::endl;
+    return;
+  }
+
   SDL_DestroyRenderer(renderer_);
   SDL_DestroyWindow(window_);
   TTF_CloseFont(font_);
@@ -160,6 +175,10 @@ void Game::draw_board() {
 }
 
 void Game::run() {
+  if (!gui_) {
+    run_without_gui();
+    return;
+  }
   bool exit = false;
   while (!exit) {
     SDL_Event event;
@@ -218,11 +237,44 @@ void Game::run() {
 
       cycle_++;
       // auto stop at cycle 100
-      if (cycle_ == 100) {
+      if ((int)cycle_ == stop_at_round_) {
         running_ = false;
       }
     }
     render();
     SDL_Delay(DELAY_MS);
   }
+}
+
+// Must be called with `running_` set to true and `stop_at_round_` set
+void Game::run_without_gui() {
+  if (!running_) {
+    std::cout << "Error: Game is not running" << std::endl;
+    return;
+  }
+  if (stop_at_round_ <= 0) {
+    std::cout << "Error: stop_at_round_ is not set" << std::endl;
+    return;
+  }
+  while ((int)cycle_ < stop_at_round_) {
+    // count cpu time
+    auto start = std::chrono::high_resolution_clock::now();
+    board_->update();
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration =
+        std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    cpu_time_ += duration.count();
+
+    cycle_++;
+  }
+}
+
+bool Game::check_GUI() {
+  int board_width = board_->get_board_size().first;
+  int board_height = board_->get_board_size().second;
+  if (board_width * CELL_SIZE + SIDEBAR_WIDTH > 3840 ||
+      board_height * CELL_SIZE > 2160) {
+    return false;
+  }
+  return true;
 }
