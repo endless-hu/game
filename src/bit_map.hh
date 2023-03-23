@@ -21,7 +21,7 @@ class BitMap {
 
   // Set the bit at position i to 1
   void set(int i) {
-    assert(static_cast<size_t>(i) < bits_.size() * 64);
+    assert(static_cast<uint64_t>(i) < bits_.size() * 64);
     bits_[i / 64] |= (1UL << (i % 64));
   }
 
@@ -48,28 +48,17 @@ class BitMap {
 
 class TwoDimBitMap {
  public:
-  TwoDimBitMap(int x_size, int y_size) {
-    bits_.resize((x_size - 1) / 64 + 1, BitMap(y_size));
-  }
+  TwoDimBitMap(int x_size, int y_size) { bits_.resize(x_size, BitMap(y_size)); }
   ~TwoDimBitMap() = default;
 
   // Set the bit at position (i, j) to 1
-  void set(int i, int j) {
-    assert(static_cast<uint64_t>(i) < bits_.size() * 64);
-    bits_[i / 64].set(j);
-  }
+  void set(int i, int j) { bits_[i].set(j); }
 
   // Set the bit at position (i, j) to 0
-  void clear(int i, int j) {
-    assert(static_cast<uint64_t>(i) < bits_.size() * 64);
-    bits_[i / 64].clear(j);
-  }
+  void clear(int i, int j) { bits_[i].clear(j); }
 
   // Get the value of the bit at position (i, j)
-  bool get(int i, int j) const {
-    assert(static_cast<uint64_t>(i) < bits_.size() * 64);
-    return bits_[i / 64].get(j);
-  }
+  bool get(int i, int j) const { return bits_[i].get(j); }
 
   // Clear the bit map
   void clear() {

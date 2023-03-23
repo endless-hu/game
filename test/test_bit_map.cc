@@ -51,15 +51,29 @@ void boarder_test() {
   }
   // set the left and right boarder
   for (int y = 0; y < 256; y++) {
-    assert(!bit_map.get(0, 0));
-    assert(!bit_map.get(255, y));
+    if (y == 0 || y == 255) {
+      assert(bit_map.get(0, y));
+      assert(bit_map.get(255, y));
+    } else {
+      assert(!bit_map.get(0, y));
+      assert(!bit_map.get(255, y));
+    }
     bit_map.set(0, y);
     bit_map.set(255, y);
-    assert(bit_map.get(0, 0));
+    assert(bit_map.get(0, y));
     assert(bit_map.get(255, y));
   }
 
-  assert(!bit_map.get(1, 1));
+  // check all points in the bitmap
+  for (int i = 0; i < 256; i++) {
+    for (int j = 0; j < 256; j++) {
+      if (i == 0 || i == 255 || j == 0 || j == 255) {
+        assert(bit_map.get(i, j));
+      } else {
+        assert(!bit_map.get(i, j));
+      }
+    }
+  }
 
   std::cout << "boarder_test passed!" << std::endl;
 }

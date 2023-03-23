@@ -207,6 +207,10 @@ void Game::run() {
     if (running_) {
       board_->update();
       cycle_++;
+      // auto stop at cycle 100
+      if (cycle_ == 100) {
+        running_ = false;
+      }
     }
     render();
     SDL_Delay(DELAY_MS);

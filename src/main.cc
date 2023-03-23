@@ -94,19 +94,21 @@ int main() {
   if (c_pid == -1) {
     perror("fork");
     exit(EXIT_FAILURE);
-  } else if (c_pid == 0) {
+  }
+  if (c_pid == 0) {
     // child process
-    OptimizedGameBoard* game_board = new OptimizedGameBoard(256, 256);
-    Game game(game_board, god_functions, true, 0);
+    AbstractGameBoard* game_board = new OptimizedGameBoard(256, 256);
+    Game game(game_board, god_functions, false, 0);
     game_board->read_state_from(vec);
     game.run();
     delete game_board;
+    exit(0);
   } else {
     GameBoard* game_board = new GameBoard(256, 256);
     game_board->read_state_from(vec);
-    Game game(game_board, god_functions, true, 0);
+    Game game(game_board, god_functions, false, 0);
     game.run();
     delete game_board;
-    wait(nullptr);
   }
+  wait(nullptr);
 }
