@@ -60,3 +60,5 @@ You can plug in more god functions in `src/main.cc`, by `push_back` self-defined
 
 2. The screenshot of the speed test.
    ![](figs/speed.png)
+
+I did not make optimizations to the time complexity. I considered about using parallel algorithms, but the compacted memory makes multi-threading no longer fast.
