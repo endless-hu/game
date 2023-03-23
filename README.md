@@ -53,3 +53,10 @@ You can plug in more god functions in `src/main.cc`, by `push_back` self-defined
    I waited for many cycles, but it seems that it did not end in a "stable" state.
    ![](figs/func2-2.png)
    
+## Screenshots of Task 3
+
+1. Comparison of the optimized version and the original version. They are the same.
+   ![](figs/compare.png)
+
+2. The screenshot of the speed test.
+   ![](figs/speed.png)

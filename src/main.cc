@@ -94,18 +94,21 @@ void test(int x_size, int y_size, int rounds) {
   }
   if (c_pid == 0) {
     // child process
-    AbstractGameBoard* game_board = new OptimizedGameBoard(x_size, y_size);
-    Game game(game_board, god_functions, true, 0, rounds);
-    game_board->read_state_from(vec);
-    game.run();
-    std::cout << "Optimized GameBoard occupied "
-              << game_board->report_mem_usage() << " bytes of memory."
-              << std::endl;
-    std::cout << "Optimized GameBoard costs " << game.report_CPU_time() / 1000
-              << " ms." << std::endl;
-    delete game_board;
+    {
+      AbstractGameBoard* game_board = new OptimizedGameBoard(x_size, y_size);
+      Game game(game_board, god_functions, true, 0, rounds);
+      game_board->read_state_from(vec);
+      game.run();
+      std::cout << "Optimized GameBoard occupied "
+                << game_board->report_mem_usage() << " bytes of memory."
+                << std::endl;
+      std::cout << "Optimized GameBoard costs " << game.report_CPU_time() / 1000
+                << " ms." << std::endl;
+      delete game_board;
+    }
     exit(0);
   } else {
+    // Parent process
     AbstractGameBoard* game_board = new GameBoard(x_size, y_size);
     game_board->read_state_from(vec);
     Game game(game_board, god_functions, true, 0, rounds);
@@ -124,6 +127,6 @@ int main() {
   srand(10808);  // Set the seed for the random number generator
   std::cout << "------- Verification Test ---------" << std::endl;
   test(256, 256, 100);
-  // std::cout << "------- Speed Test ---------" << std::endl;
-  // test(2048, 2048, 1000);
+  std::cout << "------- Speed Test ---------" << std::endl;
+  test(2048, 2048, 1000);
 }
