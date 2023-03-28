@@ -9,6 +9,8 @@
 
 #include "bit_map.hh"
 
+#define NTHR 8
+
 class AbstractGameBoard {
  public:
   virtual ~AbstractGameBoard() = default;
@@ -21,6 +23,9 @@ class AbstractGameBoard {
   // For test purpose
   virtual int report_mem_usage() = 0;
   bool operator==(const AbstractGameBoard& other) const;
+  bool operator!=(const AbstractGameBoard& other) const {
+    return !(*this == other);
+  }
 
  protected:
   // Count the number of live neighbors for a given cell

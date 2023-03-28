@@ -33,11 +33,22 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${SDL2_TTF_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARIES} ${SDL2_TTF_LIBRARIES})
 
 # Configure all ctests under test/
-# the test sources should include the header files in src/
+# The test sources should include the header files and 
+# their corresponding source files in src/
+enable_testing()
+# Add the src/ directory to the list of directories to search for include files
+include_directories(${PROJECT_SOURCE_DIR}/src)
 file(GLOB_RECURSE TEST_SOURCES "test/*.cc")
 foreach(TEST_SOURCE ${TEST_SOURCES})
   get_filename_component(TEST_NAME ${TEST_SOURCE} NAME_WE)
   add_executable(${TEST_NAME} ${TEST_SOURCE})
-  target_include_directories(${TEST_NAME} PUBLIC src)
+  # Add header and source files from src/ to test/
+  target_sources(${TEST_NAME} PRIVATE
+      ${PROJECT_SOURCE_DIR}/src/bit_map.hh
+      ${PROJECT_SOURCE_DIR}/src/game_board.hh
+      ${PROJECT_SOURCE_DIR}/src/game_board.cc
+  )
+  target_include_directories(${TEST_NAME} PUBLIC ${SDL2_TTF_INCLUDE_DIRS})
+  target_link_libraries(${TEST_NAME} ${SDL2_LIBRARIES} ${SDL2_TTF_LIBRARIES})
   add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
 endforeach()
