@@ -1,5 +1,21 @@
 #include "game_board.hh"
 
+bool AbstractGameBoard::operator==(const AbstractGameBoard& other) const {
+  auto [x_size, y_size] = get_board_size();
+  if (x_size != other.get_board_size().first ||
+      y_size != other.get_board_size().second) {
+    return false;
+  }
+  for (int x = 0; x < x_size; x++) {
+    for (int y = 0; y < y_size; y++) {
+      if (get_cell_state(x, y) != other.get_cell_state(x, y)) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
 GameBoard::GameBoard(int x_size, int y_size)
     : x_size_(x_size),
       y_size_(y_size),

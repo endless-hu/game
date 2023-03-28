@@ -20,6 +20,7 @@ class AbstractGameBoard {
   virtual void clear() = 0;   // Clear the board
   // For test purpose
   virtual int report_mem_usage() = 0;
+  bool operator==(const AbstractGameBoard& other) const;
 
  protected:
   // Count the number of live neighbors for a given cell
