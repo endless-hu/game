@@ -95,7 +95,8 @@ void test(int x_size, int y_size, int rounds) {
   if (c_pid == 0) {
     // child process
     {
-      AbstractGameBoard* game_board = new OptimizedGameBoard(x_size, y_size);
+      AbstractGameBoard* game_board =
+          new FullyOptimizedGameBoard(x_size, y_size);
       Game game(game_board, god_functions, true, 0, rounds);
       game_board->read_state_from(vec);
       game.run();

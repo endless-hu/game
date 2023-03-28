@@ -20,6 +20,11 @@ void test_game_board(int x_size, int y_size, int rounds) {
 }
 
 int main() {
-  test_game_board(256, 256, 1000);
-  std::cout << "Test passed." << std::endl;
+  std::cout << "*** Verification Test: 256x256 board, run 100 rounds"
+            << std::endl;
+  test_game_board(256, 256, 100);
+  std::cout << "=== PASS: Verification Test" << std::endl;
+  std::cout << "*** Speed Test: 2048x2048 board, run 1000 rounds" << std::endl;
+  test_game_board(2048, 2048, 1000);
+  std::cout << "=== PASS: Speed Test" << std::endl;
 }
