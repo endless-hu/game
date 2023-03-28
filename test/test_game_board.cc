@@ -14,8 +14,12 @@ void test_game_board(int x_size, int y_size, int rounds) {
   alternative_game_board->read_state_from(vec);
   GameBoardTester tester(game_board, alternative_game_board);
   tester.run(rounds, {});
+  std::cout << tester.report_cpu_time() << std::endl;
   delete game_board;
   delete alternative_game_board;
 }
 
-int main() { test_game_board(256, 256, 100); }
+int main() {
+  test_game_board(256, 256, 1000);
+  std::cout << "Test passed." << std::endl;
+}
