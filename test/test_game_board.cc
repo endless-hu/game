@@ -9,7 +9,7 @@ void test_game_board(int x_size, int y_size, int rounds) {
   }
   AbstractGameBoard* game_board = new GameBoard(x_size, y_size);
   AbstractGameBoard* alternative_game_board =
-      new OptimizedGameBoard(x_size, y_size);
+      new FullyOptimizedGameBoard(x_size, y_size);
   game_board->read_state_from(vec);
   alternative_game_board->read_state_from(vec);
   GameBoardTester tester(game_board, alternative_game_board);

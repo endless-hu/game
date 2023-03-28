@@ -81,3 +81,28 @@ class OptimizedGameBoard : public AbstractGameBoard {
   int x_size_, y_size_;  // The size of the board
   TwoDimBitMap cells_;   // The cells of the board
 };
+
+// Fully optimized implementation of the game board
+// Beside using bit_map to compress the memory usage, we also use
+// multi-threading to speed up the calculation
+class FullyOptimizedGameBoard : public AbstractGameBoard {
+ public:
+  FullyOptimizedGameBoard(int x_size, int y_size);
+  std::pair<int, int> get_board_size() const;
+  bool get_cell_state(int x, int y) const;
+  void set_cell_state(int x, int y, bool state);
+  void read_state_from(std::vector<bool>& vec);
+
+  void update();
+  void clear();
+
+  int report_mem_usage();
+
+ protected:
+  int count_live_neighbors(int x, int y);
+  bool calculate_next_state(int x, int y);
+
+ private:
+  int x_size_, y_size_;  // The size of the board
+  TwoDimBitMap cells_;   // The cells of the board
+};

@@ -1,5 +1,7 @@
 #include "game_board.hh"
 
+#include <thread>
+
 bool AbstractGameBoard::operator==(const AbstractGameBoard& other) const {
   auto [x_size, y_size] = get_board_size();
   if (x_size != other.get_board_size().first ||
@@ -170,5 +172,100 @@ bool OptimizedGameBoard::calculate_next_state(int x, int y) {
 }
 
 int OptimizedGameBoard::report_mem_usage() {
+  return cells_.report_memory_usage();
+}
+
+// ---------------------------------------------------------------------------
+//                             Fully Optimized GameBoard
+// ---------------------------------------------------------------------------
+
+FullyOptimizedGameBoard::FullyOptimizedGameBoard(int x_size, int y_size)
+    : x_size_(x_size), y_size_(y_size), cells_(x_size, y_size) {}
+
+std::pair<int, int> FullyOptimizedGameBoard::get_board_size() const {
+  return std::make_pair(x_size_, y_size_);
+}
+
+bool FullyOptimizedGameBoard::get_cell_state(int x, int y) const {
+  return cells_.get(x, y);
+}
+
+void FullyOptimizedGameBoard::set_cell_state(int x, int y, bool state) {
+  if (state) {
+    cells_.set(x, y);
+  } else {
+    cells_.clear(x, y);
+  }
+}
+
+void FullyOptimizedGameBoard::read_state_from(std::vector<bool>& vec) {
+  assert(vec.size() == (uint64_t)(x_size_ * y_size_));
+  int idx = 0;
+  for (int i = 0; i < x_size_; i++) {
+    for (int j = 0; j < y_size_; j++) {
+      if (vec[idx++]) {
+        cells_.set(i, j);
+      }
+    }
+  }
+}
+
+void FullyOptimizedGameBoard::update() {
+  TwoDimBitMap next_cells(x_size_, y_size_);
+  auto update_thread = [&](int tid) {
+    int start = tid * x_size_ / NTHR;
+    int end = (tid + 1) * x_size_ / NTHR;
+    for (int i = start; i < end; i++) {
+      for (int j = 0; j < y_size_; j++) {
+        if (calculate_next_state(i, j)) {
+          next_cells.set(i, j);
+        } else {
+          next_cells.clear(i, j);
+        }
+      }
+    }
+  };
+  // Lauch NTHR threads to update the board
+  std::vector<std::thread> threads;
+  for (int i = 0; i < NTHR; i++) {
+    threads.push_back(std::thread(update_thread, i));
+  }
+  for (auto& t : threads) {
+    t.join();
+  }
+  cells_ = next_cells;
+}
+
+void FullyOptimizedGameBoard::clear() { cells_.clear(); }
+
+int FullyOptimizedGameBoard::count_live_neighbors(int x, int y) {
+  int count = 0;
+  for (int i = -1; i <= 1; i++) {
+    for (int j = -1; j <= 1; j++) {
+      if (i == 0 && j == 0) {
+        continue;
+      }
+      int new_x = x + i;
+      int new_y = y + j;
+      if (new_x < 0 || new_x >= x_size_ || new_y < 0 || new_y >= y_size_) {
+        continue;
+      }
+      if (cells_.get(new_x, new_y)) {
+        count++;
+      }
+    }
+  }
+  return count;
+}
+
+bool FullyOptimizedGameBoard::calculate_next_state(int x, int y) {
+  int live_neighbors = count_live_neighbors(x, y);
+  if (cells_.get(x, y)) {
+    return live_neighbors == 2 || live_neighbors == 3;
+  }
+  return live_neighbors == 3;
+}
+
+int FullyOptimizedGameBoard::report_mem_usage() {
   return cells_.report_memory_usage();
 }
